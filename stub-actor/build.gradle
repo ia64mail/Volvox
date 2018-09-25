@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+sourceCompatibility = 1.10
+targetCompatibility = 1.10
+
+import java.util.regex.Matcher
+
+dependencies {
+    //internal dependencies
+    implementation project(':common')
+
+    //3rd party libs
+    implementation 'com.typesafe.akka:akka-actor_2.12:2.5.16'
+
+    //test dependencies
+    testImplementation 'com.typesafe.akka:akka-testkit_2.12:2.5.16'
+    testImplementation 'junit:junit:4.12'
+}
+
+ext.moduleName = 'volvox.stub'
+
+mainClassName = "$moduleName/volvox.stub.StubActor"
+
+run {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        jvmArgs = [
+                '--module-path', classpath.asPath,
+                '--module', mainClassName
+        ]
+        classpath = files()
+    }
+}
+
+startScripts {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        classpath = files()
+        defaultJvmOpts = [
+                '--module-path', 'APP_HOME_LIBS',
+                '--module', mainClassName
+        ]
+    }
+    doLast{
+        def bashFile = new File(outputDir, applicationName)
+        String bashContent = bashFile.text
+        bashFile.text = bashContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('$APP_HOME/lib'))
+
+        def batFile = new File(outputDir, applicationName + ".bat")
+        String batContent = batFile.text
+        batFile.text = batContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('%APP_HOME%\\lib'))
+    }
+}

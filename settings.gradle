@@ -1,0 +1,6 @@
+rootProject.name = 'volvox'
+
+//include 'docs'
+include 'common'
+include 'lighthouse'
+include 'stub-actor'

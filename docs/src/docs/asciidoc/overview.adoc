@@ -1,0 +1,3 @@
+= Volvox Application
+
+A simple application demonstrating the flexibility of a Gradle multi-project.
