@@ -9,31 +9,42 @@ targetCompatibility = 1.10
 import java.util.regex.Matcher
 
 dependencies {
-    //internal dependencies
+    /* internal dependencies */
     implementation project(':common')
 
-    //3rd party libs
-    implementation 'com.typesafe.akka:akka-actor_2.12:2.5.16'
+    /* 3rd party libs */
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor
+    implementation group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote
+    implementation group: 'com.typesafe.akka', name: 'akka-remote_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-cluster
+    implementation group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-slf4j
+    implementation group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 
-    //test dependencies
-    testImplementation 'com.typesafe.akka:akka-testkit_2.12:2.5.16'
-    testImplementation 'junit:junit:4.12'
+    /* test dependencies */
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-testkit
+    testImplementation group: 'com.typesafe.akka', name: 'akka-testkit_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/junit/junit
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
 
 ext.moduleName = 'volvox.lighthouse'
 
-mainClassName = "$moduleName/volvox.lighthouse.Lighthouse"
-
-run {
-    inputs.property("moduleName", moduleName)
-    doFirst {
-        jvmArgs = [
-                '--module-path', classpath.asPath,
-                '--module', mainClassName
-        ]
-        classpath = files()
-    }
-}
+mainClassName = "volvox.lighthouse.Lighthouse"
+//mainClassName = "$moduleName/volvox.lighthouse.Lighthouse"
+//run {
+//    inputs.property("moduleName", moduleName)
+//    doFirst {
+//        jvmArgs = [
+//                '--module-path', classpath.asPath,
+//                '--module', mainClassName
+//        ]
+//        classpath = files()
+//    }
+//}
 
 startScripts {
     inputs.property("moduleName", moduleName)
@@ -44,7 +55,7 @@ startScripts {
                 '--module', mainClassName
         ]
     }
-    doLast{
+    doLast {
         def bashFile = new File(outputDir, applicationName)
         String bashContent = bashFile.text
         bashFile.text = bashContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('$APP_HOME/lib'))

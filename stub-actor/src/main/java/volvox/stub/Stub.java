@@ -1,17 +1,14 @@
-package volvox.lighthouse;
+package volvox.stub;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import volvox.lighthouse.actor.LighthouseActor;
-import volvox.common.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import volvox.common.utils.ActorNameUtils;
+import volvox.stub.actor.StubActor;
 
-/**
- * Lighthouse actor responsible for joining to the cluster.
- */
-public class Lighthouse {
-    private static Logger logger = LoggerFactory.getLogger(Lighthouse.class);
+public class Stub {
+    private static Logger logger = LoggerFactory.getLogger(Stub.class);
 
     public static void main(String[] args) {
         var utils = new ActorNameUtils();
@@ -19,7 +16,7 @@ public class Lighthouse {
         try {
             logger.info("Akka stared successfully ...");
 
-            final ActorRef lighthouseActor = system.actorOf(LighthouseActor.props(), "lighthouse");
+            final ActorRef stubActor = system.actorOf(StubActor.props(), "stub");
 
         } catch (Exception ioe) {
             logger.error(ioe.toString());
