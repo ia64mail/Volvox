@@ -1,0 +1,10 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    //test dependencies
+    testImplementation 'junit:junit:4.12'
+}
+
+ext.moduleName = 'volvox.model'
