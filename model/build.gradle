@@ -1,10 +1,15 @@
 plugins {
+    id 'java'
     id 'java-library'
 }
+
+sourceCompatibility = "${globalSourceCompatibility}"
+targetCompatibility = "${globalTargetCompatibility}"
+
+ext.moduleName = 'volvox.model'
 
 dependencies {
     //test dependencies
     testImplementation 'junit:junit:4.12'
 }
 
-ext.moduleName = 'volvox.model'

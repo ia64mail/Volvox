@@ -1,3 +1,5 @@
+import java.util.regex.Matcher
+
 plugins {
     id 'idea'
     id 'org.asciidoctor.convert' version '1.5.6' apply false
@@ -8,6 +10,14 @@ subprojects {
 }
 
 subprojects {
+    ext {
+        /*
+            Java plugin settings
+         */
+        globalSourceCompatibility = '1.10'
+        globalTargetCompatibility = '1.10'
+    }
+
     afterEvaluate {
         repositories {
             jcenter()
@@ -15,42 +25,55 @@ subprojects {
             mavenLocal()
         }
 
-        compileJava {
-            inputs.property("moduleName", moduleName)
-            doFirst {
-                options.compilerArgs = [
-                        '--module-path', classpath.asPath,
-                ]
-                classpath = files()
+        /*
+            Common configuration for application plugin
+         */
+        if (plugins.hasPlugin('application')) {
+            ext {
+                /*
+                    Application plugin settings
+                 */
+                distributionConfigLocation = 'config'
+            }
+
+
+            //setup logger config location
+            run {
+                doFirst {
+                    jvmArgs = [
+                            "-Dlog4j.configurationFile=${rootDir}/config/commonLog4j2.xml,${projectDir}/config/log4j2.xml"
+                    ]
+                }
+            }
+            startScripts {
+                doFirst {
+                    defaultJvmOpts = [
+                            "-Dlog4j.configurationFile=APPROOT${distributionConfigLocation}/commonLog4j2.xml,APPROOT${distributionConfigLocation}/log4j2.xml"
+                    ]
+                }
+                doLast {
+                    def bashFile = new File(outputDir, applicationName)
+                    String bashContent = bashFile.text
+                    bashFile.text = bashContent.replaceAll('APPROOT', Matcher.quoteReplacement('$APP_HOME/'))
+
+                    def batFile = new File(outputDir, applicationName + ".bat")
+                    String batContent = batFile.text
+                    batFile.text = batContent.replaceAll('APPROOT', Matcher.quoteReplacement('%APP_HOME%\\'))
+                }
+            }
+            distributions {
+                main {
+                    contents {
+                        from("${rootDir}/config") {
+                            into "${distributionConfigLocation}"
+                        }
+                        from("${projectDir}/config") {
+                            into "${distributionConfigLocation}"
+                        }
+                    }
+                }
             }
         }
-
-        compileTestJava {
-            inputs.property("moduleName", moduleName)
-            doFirst {
-                options.compilerArgs = [
-                        '--module-path', classpath.asPath,
-                        '--add-modules', 'junit',
-                        '--add-reads', "$moduleName=junit",
-                        '--patch-module', "$moduleName=" + files(sourceSets.test.java.srcDirs).asPath,
-                ]
-                classpath = files()
-            }
-        }
-
-        test {
-            inputs.property("moduleName", moduleName)
-            doFirst {
-                jvmArgs = [
-                        '--module-path', classpath.asPath,
-                        '--add-modules', 'ALL-MODULE-PATH',
-                        '--add-reads', "$moduleName=junit",
-                        '--patch-module', "$moduleName=" + files(sourceSets.test.java.outputDir).asPath,
-                ]
-                classpath = files()
-            }
-        }
-
         jar {
             inputs.property("moduleName", moduleName)
             manifest {

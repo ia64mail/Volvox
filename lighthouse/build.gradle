@@ -3,10 +3,11 @@ plugins {
     id 'application'
 }
 
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
+sourceCompatibility = "${globalSourceCompatibility}"
+targetCompatibility = "${globalTargetCompatibility}"
 
-import java.util.regex.Matcher
+ext.moduleName = "volvox.lighthouse"
+mainClassName = "volvox.lighthouse.Lighthouse"
 
 dependencies {
     /* internal dependencies */
@@ -21,51 +22,16 @@ dependencies {
     implementation group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.16'
     // https://mvnrepository.com/artifact/com.typesafe.akka/akka-slf4j
     implementation group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: '2.5.16'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-    runtime group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12
-    runtime group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.8.0-beta2'
-    // https://mvnrepository.com/artifact/com.jcabi/jcabi-log (colored output layout)
-    runtime group: 'com.jcabi', name: 'jcabi-log', version: '0.18'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.1'
+    // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+    runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
 
     /* test dependencies */
     // https://mvnrepository.com/artifact/com.typesafe.akka/akka-testkit
     testImplementation group: 'com.typesafe.akka', name: 'akka-testkit_2.12', version: '2.5.16'
     // https://mvnrepository.com/artifact/junit/junit
     testImplementation group: 'junit', name: 'junit', version: '4.12'
-}
-
-ext.moduleName = 'volvox.lighthouse'
-
-mainClassName = "volvox.lighthouse.Lighthouse"
-//mainClassName = "$moduleName/volvox.lighthouse.Lighthouse"
-//run {
-//    inputs.property("moduleName", moduleName)
-//    doFirst {
-//        jvmArgs = [
-//                '--module-path', classpath.asPath,
-//                '--module', mainClassName
-//        ]
-//        classpath = files()
-//    }
-//}
-
-startScripts {
-    inputs.property("moduleName", moduleName)
-    doFirst {
-        classpath = files()
-        defaultJvmOpts = [
-                '--module-path', 'APP_HOME_LIBS',
-                '--module', mainClassName
-        ]
-    }
-    doLast {
-        def bashFile = new File(outputDir, applicationName)
-        String bashContent = bashFile.text
-        bashFile.text = bashContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('$APP_HOME/lib'))
-
-        def batFile = new File(outputDir, applicationName + ".bat")
-        String batContent = batFile.text
-        batFile.text = batContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('%APP_HOME%\\lib'))
-    }
 }
