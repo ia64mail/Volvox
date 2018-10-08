@@ -1,4 +1,5 @@
 import java.util.regex.Matcher
+import org.apache.tools.ant.filters.*
 
 plugins {
     id 'idea'
@@ -6,9 +7,11 @@ plugins {
 }
 
 subprojects {
+    group = 'volvox'
     version = '0.0.0.0'
 }
 
+def projectIndex = 0
 subprojects {
     ext {
         /*
@@ -29,6 +32,17 @@ subprojects {
             Common configuration for application plugin
          */
         if (plugins.hasPlugin('application')) {
+
+            //evaluate system IP address for dev env run only
+            def subnetPrefix = '127.0.8.'
+            def lighthouseIp = subnetPrefix + 1
+            def selfIp = lighthouseIp
+            if (name != 'lighthouse') {
+                def ipSeg = 64 + projectIndex
+                selfIp = subnetPrefix + ipSeg
+                projectIndex++
+            }
+
             ext {
                 /*
                     Application plugin settings
@@ -36,12 +50,13 @@ subprojects {
                 distributionConfigLocation = 'config'
             }
 
-
             //setup logger config location
             run {
                 doFirst {
                     jvmArgs = [
-                            "-Dlog4j.configurationFile=${rootDir}/config/commonLog4j2.xml,${projectDir}/config/log4j2.xml"
+                            "-Dlog4j.configurationFile=${rootDir}/config/commonLog4j2.xml,${projectDir}/config/log4j2.xml",
+                            "-DAKKA_SYSTEM_HOSTNAME=${selfIp}",
+                            "-DAKKA_LIGHTHOUSE_IP=akka://volvox@${lighthouseIp}:25520"
                     ]
                 }
             }
@@ -62,8 +77,15 @@ subprojects {
                 }
             }
             distributions {
+                def contentSpec = copySpec {
+                    from("${rootDir}/docker") {
+                        filter(ReplaceTokens, tokens: ['someToken': '123456789'])
+                    }
+                }
+
                 main {
                     contents {
+                        //with contentSpec
                         from("${rootDir}/config") {
                             into "${distributionConfigLocation}"
                         }

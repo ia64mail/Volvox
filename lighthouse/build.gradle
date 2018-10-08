@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.bmuschko.docker-java-application' version '3.6.2'
 }
 
 sourceCompatibility = "${globalSourceCompatibility}"
@@ -22,6 +23,12 @@ dependencies {
     implementation group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.16'
     // https://mvnrepository.com/artifact/com.typesafe.akka/akka-slf4j
     implementation group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: '2.5.16'
+
+    // https://mvnrepository.com/artifact/com.lightbend.akka.management/akka-management-cluster-bootstrap
+    implementation group: 'com.lightbend.akka.management', name: 'akka-management-cluster-bootstrap_2.12', version: '0.18.0'
+    // https://mvnrepository.com/artifact/com.lightbend.akka.discovery/akka-discovery-kubernetes-api
+    implementation group: 'com.lightbend.akka.discovery', name: 'akka-discovery-kubernetes-api_2.12', version: '0.18.0'
+
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
     runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
@@ -34,4 +41,11 @@ dependencies {
     testImplementation group: 'com.typesafe.akka', name: 'akka-testkit_2.12', version: '2.5.16'
     // https://mvnrepository.com/artifact/junit/junit
     testImplementation group: 'junit', name: 'junit', version: '4.12'
+}
+
+docker {
+    javaApplication {
+        baseImage = 'openjdk:10.0-jdk-slim'
+        ports = [25520, 8558]
+    }
 }
