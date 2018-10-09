@@ -24,6 +24,9 @@ dependencies {
     implementation group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.16'
     // https://mvnrepository.com/artifact/com.typesafe.akka/akka-slf4j
     implementation group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/com.github.romix.akka/akka-kryo-serialization
+    implementation group: 'com.github.romix.akka', name: 'akka-kryo-serialization_2.12', version: '0.5.2'
+
 
     // https://mvnrepository.com/artifact/com.lightbend.akka.management/akka-management-cluster-bootstrap
     implementation group: 'com.lightbend.akka.management', name: 'akka-management-cluster-bootstrap_2.12', version: '0.18.0'

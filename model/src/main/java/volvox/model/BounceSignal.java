@@ -1,6 +1,6 @@
 package volvox.model;
 
-public class BounceSignal {
+public class BounceSignal implements IMessage {
     private final int count;
 
     public BounceSignal() {
