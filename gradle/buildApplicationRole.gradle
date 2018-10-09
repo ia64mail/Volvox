@@ -1,0 +1,78 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+import java.util.regex.Matcher
+
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty('roles')) {
+            return
+        }
+        def projectRoles = (String[]) ext.roles
+
+        if (projectRoles.contains('application')) {
+            logger.warn('Configuring ' + name + ' with \'application\' role')
+
+            dependencies {
+                /* 3rd party libs */
+                // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+                runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+                // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
+                runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.1'
+                // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+                runtimeOnly group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+
+                /* test dependencies */
+                // https://mvnrepository.com/artifact/junit/junit
+                testImplementation group: 'junit', name: 'junit', version: '4.12'
+            }
+
+            ext {
+                distributionConfigLocation = 'config'
+            }
+
+            //setup logger config location
+            run {
+                doFirst {
+                    jvmArgs = [
+                            "-Dlog4j.configurationFile=${rootDir}/config/commonLog4j2.xml,${projectDir}/config/log4j2.xml",
+                    ]
+                }
+            }
+            startScripts {
+                doFirst {
+                    defaultJvmOpts = [
+                            "-Dlog4j.configurationFile=APPROOT${distributionConfigLocation}/commonLog4j2.xml,APPROOT${distributionConfigLocation}/log4j2.xml"
+                    ]
+                }
+                doLast {
+                    def bashFile = new File(outputDir, applicationName)
+                    String bashContent = bashFile.text
+                    bashFile.text = bashContent.replaceAll('APPROOT', Matcher.quoteReplacement('$APP_HOME/'))
+
+                    def batFile = new File(outputDir, applicationName + ".bat")
+                    String batContent = batFile.text
+                    batFile.text = batContent.replaceAll('APPROOT', Matcher.quoteReplacement('%APP_HOME%\\'))
+                }
+            }
+            distributions {
+                def contentSpec = copySpec {
+                    from("${rootDir}/docker") {
+                        filter(ReplaceTokens, tokens: ['someToken': '123456789'])
+                    }
+                }
+
+                main {
+                    contents {
+                        //with contentSpec
+                        from("${rootDir}/config") {
+                            into "${distributionConfigLocation}"
+                        }
+                        from("${projectDir}/config") {
+                            into "${distributionConfigLocation}"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

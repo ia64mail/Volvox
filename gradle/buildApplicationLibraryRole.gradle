@@ -1,0 +1,18 @@
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty('roles')) {
+            return
+        }
+        def projectRoles = (String[]) ext.roles
+
+        if (projectRoles.contains('library')) {
+            logger.warn('Configuring ' + name + ' with \'library\' role')
+
+            dependencies {
+                /* test dependencies */
+                // https://mvnrepository.com/artifact/junit/junit
+                testImplementation group: 'junit', name: 'junit', version: '4.12'
+            }
+        }
+    }
+}

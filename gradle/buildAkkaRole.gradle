@@ -1,0 +1,30 @@
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty('roles')) {
+            return
+        }
+        def projectRoles = (String[]) ext.roles
+
+        if (projectRoles.contains('akka')) {
+            logger.warn('Configuring ' + name + ' with \'akka\' role')
+
+            dependencies {
+                /* 3rd party libs */
+                // https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor
+                implementation group: 'com.typesafe.akka', name: 'akka-actor_2.12', version: '2.5.16'
+                // https://mvnrepository.com/artifact/com.typesafe.akka/akka-remote
+                implementation group: 'com.typesafe.akka', name: 'akka-remote_2.12', version: '2.5.16'
+                // https://mvnrepository.com/artifact/com.typesafe.akka/akka-cluster
+                implementation group: 'com.typesafe.akka', name: 'akka-cluster_2.12', version: '2.5.16'
+                // https://mvnrepository.com/artifact/com.typesafe.akka/akka-slf4j
+                implementation group: 'com.typesafe.akka', name: 'akka-slf4j_2.12', version: '2.5.16'
+                // https://mvnrepository.com/artifact/com.github.romix.akka/akka-kryo-serialization
+                implementation group: 'com.github.romix.akka', name: 'akka-kryo-serialization_2.12', version: '0.5.2'
+
+                /* test dependencies */
+                // https://mvnrepository.com/artifact/com.typesafe.akka/akka-testkit
+                testImplementation group: 'com.typesafe.akka', name: 'akka-testkit_2.12', version: '2.5.16'
+            }
+        }
+    }
+}

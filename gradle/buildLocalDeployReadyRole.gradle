@@ -1,0 +1,32 @@
+def projectIndex = 0
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty('roles')) {
+            return
+        }
+        def projectRoles = (String[]) ext.roles
+
+        if (projectRoles.contains('local_deploy_ready')) {
+            logger.warn('Configuring ' + name + ' with \'local_deploy_ready\' role')
+
+            //evaluate system IP address for dev env run only
+            def subnetPrefix = '127.0.8.'
+            def lighthouseIp = subnetPrefix + 1
+            def selfIp = lighthouseIp
+            if (name != 'lighthouse') {
+                def ipSeg = 64 + projectIndex
+                selfIp = subnetPrefix + ipSeg
+                projectIndex++
+            }
+
+            run {
+                doFirst {
+                    jvmArgs = [
+                            "-DAKKA_SYSTEM_HOSTNAME=${selfIp}",
+                            "-DAKKA_LIGHTHOUSE_IP=akka://volvox@${lighthouseIp}:25520"
+                    ]
+                }
+            }
+        }
+    }
+}

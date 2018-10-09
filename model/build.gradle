@@ -3,13 +3,6 @@ plugins {
     id 'java-library'
 }
 
-sourceCompatibility = "${globalSourceCompatibility}"
-targetCompatibility = "${globalTargetCompatibility}"
+ext.roles = ['java', 'library']
 
 ext.moduleName = 'volvox.model'
-
-dependencies {
-    //test dependencies
-    testImplementation 'junit:junit:4.12'
-}
-

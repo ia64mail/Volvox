@@ -1,0 +1,28 @@
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty('roles')) {
+            return
+        }
+        def projectRoles = (String[]) ext.roles
+
+        if (projectRoles.contains('java')) {
+            logger.warn('Configuring ' + name + ' with \'java\' role')
+
+            project.sourceCompatibility = '1.10'
+            project.targetCompatibility = '1.10'
+
+            repositories {
+                mavenLocal()
+                mavenCentral()
+                jcenter()
+            }
+
+            jar {
+                inputs.property("moduleName", moduleName)
+                manifest {
+                    attributes('Automatic-Module-Name': moduleName)
+                }
+            }
+        }
+    }
+}

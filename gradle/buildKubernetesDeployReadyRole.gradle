@@ -1,0 +1,27 @@
+subprojects {
+    afterEvaluate { project ->
+        if (!project.hasProperty('roles')) {
+            return
+        }
+        def projectRoles = (String[]) ext.roles
+
+        if (projectRoles.contains('kubernetes_deploy_ready')) {
+            logger.warn('Configuring ' + name + ' with \'kubernetes_deploy_ready\' role')
+
+            dependencies {
+                /* 3rd party libs */
+                // https://mvnrepository.com/artifact/com.lightbend.akka.management/akka-management-cluster-bootstrap
+                implementation group: 'com.lightbend.akka.management', name: 'akka-management-cluster-bootstrap_2.12', version: '0.18.0'
+                // https://mvnrepository.com/artifact/com.lightbend.akka.discovery/akka-discovery-kubernetes-api
+                implementation group: 'com.lightbend.akka.discovery', name: 'akka-discovery-kubernetes-api_2.12', version: '0.18.0'
+            }
+
+            docker {
+                javaApplication {
+                    baseImage = 'openjdk:10.0-jdk-slim'
+                    ports = [25520, 8558]
+                }
+            }
+        }
+    }
+}
