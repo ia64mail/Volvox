@@ -40,6 +40,16 @@ volvox/lighthouse                          0.0.0.0             e26af549b4fd     
 ...
 ```
 
+##### Manage build versions
+
+To issue a new SVN tag and push it into repo use following command
+
+```cmd
+./gradlew build reckonTagPush -Preckon.scope=<major|minor|patch> -Preckon.stage=<alpha|beta|rc|final>
+```
+
+See more details at [How Reckon Works](https://github.com/ajoberstar/reckon/blob/master/docs/index.md).
+
 ## Deployment notes
 
 TBD with custom Grunt task!

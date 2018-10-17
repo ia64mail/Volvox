@@ -1,3 +1,6 @@
+//for Ant filter
+import org.apache.tools.ant.filters.ReplaceTokens
+
 subprojects {
     afterEvaluate { project ->
         if (!project.hasProperty('roles')) {
@@ -16,11 +19,44 @@ subprojects {
                 implementation group: 'com.lightbend.akka.discovery', name: 'akka-discovery-kubernetes-api_2.12', version: '0.18.0'
             }
 
+            /**
+             * Configure Docker image.
+             *
+             * See details at http://bmuschko.github.io/gradle-docker-plugin/
+             */
             docker {
+                // A tag name must be valid ASCII and may contain lowercase and uppercase letters, digits,
+                // underscores, periods and dashes. A tag name may not start with a period or a dash
+                // and may contain a maximum of 128 characters.
+                // https://docs.docker.com/engine/reference/commandline/tag/
+                def safeVersion = ((String) version.toString()).replace('+', '_')
+
                 javaApplication {
                     baseImage = 'openjdk:10.0-jdk-slim'
-                    ports = [25520, 8558]
+                    ports = [
+                            25520,  //Default AKKA port
+                            8558    //AKKA management bootstrap port
+                    ]
+                    tag = "${group}/${name}:${safeVersion}"
                 }
+
+                project.ext.dockerImageArtifactAndVersion = javaApplication.tag
+            }
+
+            project.task('copyKubernetesDeploySpec', type: Copy, dependsOn: dockerBuildImage) {
+                    from "${rootDir}/kubernetes/controllers/akkaAktorDeploymentSpec.yaml"
+                    into "${buildDir}/kubernetes/controllers/akkaAktorDeploymentSpec.yaml"
+                    filter(ReplaceTokens, tokens: [
+                            dockerImage: project.ext.dockerImageArtifactAndVersion,
+                            projectName: project.name,
+                            groupName  : project.group,
+                    ])
+                    outputs.upToDateWhen { false } //run always because docker version
+            }
+
+            project.task('applyKubernetesDeploy', type: Exec, dependsOn: copyKubernetesDeploySpec) {
+                commandLine "kubectl", "apply", "-f", "${buildDir}/kubernetes/controllers/akkaAktorDeploymentSpec.yaml"
+                errorOutput System.out
             }
         }
     }

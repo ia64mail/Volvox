@@ -11,12 +11,17 @@ subprojects {
             project.sourceCompatibility = '1.10'
             project.targetCompatibility = '1.10'
 
+            //connect to remote package repositories
             repositories {
                 mavenLocal()
                 mavenCentral()
                 jcenter()
             }
 
+            //ensure that project state is valid before issue a new tag
+            reckonTagCreate.dependsOn check
+
+            //provide compartible module name in the JAR manifest
             jar {
                 inputs.property("moduleName", moduleName)
                 manifest {

@@ -1,18 +1,18 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: volvox-stub-deployment
+  name: @projectName@-deployment
   labels:
-    app: volvox
+    app: @groupName@
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: volvox-stub
+      app: @projectName@
   template:
     metadata:
       labels:
-        app: volvox-stub
+        app: @projectName@
         actorSystemName: volvox
     spec:
       volumes:
@@ -20,11 +20,11 @@ spec:
         emptyDir:
           medium: Memory
       containers:
-      - name: volvox-stub
-        image: volvox/stub-actor:0.0.0.0
+      - name: @projectName@
+        image: @dockerImage@
         volumeMounts:
-        - mountPath: /dev/shm
-          name: dshm
+          - mountPath: /dev/shm
+            name: dshm
         imagePullPolicy: Never
         livenessProbe:
           tcpSocket:
