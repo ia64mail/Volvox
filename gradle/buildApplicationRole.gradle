@@ -34,41 +34,36 @@ subprojects {
             run {
                 doFirst {
                     jvmArgs = [
-                            "-Dlog4j.configurationFile=${rootDir}/config/commonLog4j2.xml,${projectDir}/config/log4j2.xml",
+                            "-Dlog4j.configurationFile=commonLog4j2.xml,log4j2.xml",
                     ]
+                    classpath += files("${rootDir}/config", "${projectDir}/config")
                 }
             }
             startScripts {
                 doFirst {
                     defaultJvmOpts = [
-                            "-Dlog4j.configurationFile=APPROOT${distributionConfigLocation}/commonLog4j2.xml,APPROOT${distributionConfigLocation}/log4j2.xml"
+                            "-Dlog4j.configurationFile=commonLog4j2.xml,log4j2.xml"
                     ]
+                    classpath += files("STUB_CONFIG_FOLDER_TO_REPLACE") //workaround to keep configs in separate folder
                 }
                 doLast {
                     def bashFile = new File(outputDir, applicationName)
                     String bashContent = bashFile.text
                     bashFile.text = bashContent.replaceAll('APPROOT', Matcher.quoteReplacement('$APP_HOME/'))
+                    bashFile.text = bashContent.replace('$APP_HOME/lib/STUB_CONFIG_FOLDER_TO_REPLACE', '$APP_HOME/' + "${distributionConfigLocation}/")
 
                     def batFile = new File(outputDir, applicationName + ".bat")
                     String batContent = batFile.text
                     batFile.text = batContent.replaceAll('APPROOT', Matcher.quoteReplacement('%APP_HOME%\\'))
+                    batFile.text = batContent.replace('%APP_HOME%\\lib\\STUB_CONFIG_FOLDER_TO_REPLACE', '%APP_HOME%\\' + "${distributionConfigLocation}\\")
                 }
             }
             distributions {
-                def contentSpec = copySpec {
-                    from("${rootDir}/docker") {
-                        filter(ReplaceTokens, tokens: ['someToken': '123456789'])
-                    }
-                }
-
                 main {
                     contents {
-                        //with contentSpec
-                        from("${rootDir}/config") {
-                            into "${distributionConfigLocation}"
-                        }
-                        from("${projectDir}/config") {
-                            into "${distributionConfigLocation}"
+                        into("${distributionConfigLocation}") {
+                            from "${projectDir}/config"
+                            from "${rootDir}/config"
                         }
                     }
                 }

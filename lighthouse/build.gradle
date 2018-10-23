@@ -10,5 +10,6 @@ mainClassName = "volvox.lighthouse.Lighthouse"
 
 dependencies {
     /* internal dependencies */
+    implementation project(':model')
     implementation project(':common')
 }
