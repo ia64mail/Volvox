@@ -9,6 +9,7 @@ Hints:
  - Use following command to `eval $(minikube docker-env)` to reuse Munikube’s built-in Docker daemon; 
    see more details at [Reusing the Docker daemon](https://kubernetes.io/docs/setup/minikube/#reusing-the-docker-daemon)
  - Access to Minikube Dashboard using `minikube dashboard`
+ - [Configure IDE](https://doc.akka.io/docs/akka/2.5/additional/ide.html) to avoid ambiguous Java/Scala imports  
  
 ## Build notes
 

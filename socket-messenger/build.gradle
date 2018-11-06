@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.bmuschko.docker-java-application' version '3.6.2'
+}
+
+ext.roles = ['java', 'application', 'akka', 'local_deploy_ready', 'kubernetes_deploy_ready']
+
+ext.moduleName = "volvox.messenger"
+mainClassName = "volvox.messenger.WebSocketServer"
+
+dependencies {
+    /* internal dependencies */
+    implementation project(':model')
+    implementation project(':common')
+
+    /* 3rd party libs */
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-stream_2.12/2.5.16
+    implementation group: 'com.typesafe.akka', name: 'akka-stream_2.12', version: '2.5.16'
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-http-core
+    implementation group: 'com.typesafe.akka', name: 'akka-http-core_2.12', version: '10.1.5'
+    // https://mvnrepository.com/artifact/com.typesafe.akka/akka-http
+    implementation group: 'com.typesafe.akka', name: 'akka-http_2.12', version: '10.1.5'
+}
