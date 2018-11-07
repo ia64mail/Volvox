@@ -7,7 +7,7 @@ plugins {
 ext.roles = ['java', 'application', 'akka', 'local_deploy_ready', 'kubernetes_deploy_ready']
 
 ext.moduleName = "volvox.messenger"
-mainClassName = "volvox.messenger.WebSocketServer"
+mainClassName = "volvox.messenger.WebSocket"
 
 dependencies {
     /* internal dependencies */

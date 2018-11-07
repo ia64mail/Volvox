@@ -4,17 +4,19 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.management.AkkaManagement;
 import akka.management.cluster.bootstrap.ClusterBootstrap;
+import com.typesafe.config.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import volvox.common.utils.ActorNameUtils;
 import volvox.stub.actor.StubActor;
 
 public class Stub {
     private static Logger logger = LoggerFactory.getLogger(Stub.class);
 
+    private static final String akkaNameConfig = "akka.name";
+
     public static void main(String[] args) {
-        var utils = new ActorNameUtils();
-        final ActorSystem system = ActorSystem.create(utils.toLowerCase("volvox"));
+        final var config = ConfigFactory.load();
+        final ActorSystem system = ActorSystem.create(config.getString(akkaNameConfig));
 
         //See https://github.com/akka/akka-management/issues/282
         if (system.settings().config().getStringList("akka.cluster.seed-nodes").size() == 0) {

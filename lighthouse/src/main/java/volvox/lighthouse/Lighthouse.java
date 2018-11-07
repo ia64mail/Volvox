@@ -2,24 +2,25 @@ package volvox.lighthouse;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
+import com.typesafe.config.ConfigFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import volvox.lighthouse.actor.LighthouseActor;
-import volvox.common.utils.*;
 
 /**
  * Lighthouse actor responsible for joining to the cluster.
  */
 public class Lighthouse {
-    private static LoggingAdapter logger;
+    private static Logger logger = LoggerFactory.getLogger(Lighthouse.class);
+
+    private static final String akkaNameConfig = "akka.name";
 
     public static void main(String[] args) {
-        var utils = new ActorNameUtils();
-        final ActorSystem system = ActorSystem.create(utils.toLowerCase("volvox"));
+        final var config = ConfigFactory.load();
+        final ActorSystem system = ActorSystem.create(config.getString(akkaNameConfig));
 
-        logger = Logging.getLogger(system, "main");
         try {
-            logger.warning("Akka stared successfully ...");
+            logger.info("Akka stared successfully ...");
 
             final ActorRef lighthouseActor = system.actorOf(LighthouseActor.props(), "lighthouse");
 
