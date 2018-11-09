@@ -48,7 +48,7 @@ public class WebSocket {
             Materializer materializer = ActorMaterializer.create(system);
 
             //In order to access all directives we need an instance where the routes are define.
-            WebSocketServer app = new WebSocketServer();
+            WebSocketServer app = new WebSocketServer(system);
 
             final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
                     app.createRoute().flow(system, materializer);
