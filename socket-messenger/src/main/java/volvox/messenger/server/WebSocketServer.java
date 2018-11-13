@@ -65,6 +65,7 @@ public class WebSocketServer extends AllDirectives {
         Sink<Message, NotUsed> sink =
                 Flow.<Message>create()
                         .map((msg) -> new Incoming(msg.asTextMessage().getStrictText()))
+                        .concat(Source.single(new Incoming("BYE!!!!")))
                         .to(Sink.actorRef(flowManager, PoisonPill.getInstance()));
 
         Flow<Message, Message, NotUsed> flow = Flow.fromSinkAndSource(sink, source);

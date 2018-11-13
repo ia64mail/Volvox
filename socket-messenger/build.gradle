@@ -21,4 +21,11 @@ dependencies {
     implementation group: 'com.typesafe.akka', name: 'akka-http-core_2.12', version: '10.1.5'
     // https://mvnrepository.com/artifact/com.typesafe.akka/akka-http
     implementation group: 'com.typesafe.akka', name: 'akka-http_2.12', version: '10.1.5'
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.7'
 }
