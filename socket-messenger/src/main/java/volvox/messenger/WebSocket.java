@@ -19,6 +19,7 @@ import volvox.messenger.server.WebSocketServer;
 import java.util.concurrent.CompletionStage;
 
 
+@SuppressWarnings("Duplicates")
 public class WebSocket {
     private static Logger logger = LoggerFactory.getLogger(WebSocket.class);
 
@@ -50,8 +51,7 @@ public class WebSocket {
             //In order to access all directives we need an instance where the routes are define.
             WebSocketServer app = new WebSocketServer(system);
 
-            final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow =
-                    app.createRoute().flow(system, materializer);
+            final Flow<HttpRequest, HttpResponse, NotUsed> routeFlow = app.createRoute().flow(system, materializer);
             final CompletionStage<ServerBinding> binding =
                     http.bindAndHandle(
                             routeFlow,

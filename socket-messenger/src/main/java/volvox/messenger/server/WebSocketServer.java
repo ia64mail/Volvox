@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebSocketServer extends AllDirectives {
+    private static final int BUFFER_SIZE = 10;
     private static Logger logger = LoggerFactory.getLogger(WebSocketServer.class);
 
     private static final String wsPathConfig = "ws.path";
@@ -55,17 +56,17 @@ public class WebSocketServer extends AllDirectives {
 
         //response
         Source<Message, NotUsed> source =
-                Source.<Outgoing>actorRef(5, OverflowStrategy.fail())
-                        .map((outgoing) -> (Message) TextMessage.create(outgoing.getMessageText()))
-                        .<NotUsed>mapMaterializedValue(destinationRef -> {
-                            flowManager.tell(new OutgoingDestination(destinationRef), ActorRef.noSender());
+                Source.<Outgoing>actorRef(BUFFER_SIZE, OverflowStrategy.fail())
+                        .map((outgoing) -> (Message) TextMessage.create(outgoing.getPayload()))
+                        .<NotUsed>mapMaterializedValue(flowHandlerActor -> {
+                            flowManager.tell(new OnConnected(flowHandlerActor), ActorRef.noSender());
                             return NotUsed.getInstance();
                         });
         // request
         Sink<Message, NotUsed> sink =
                 Flow.<Message>create()
-                        .map((msg) -> new Incoming(msg.asTextMessage().getStrictText()))
-                        .concat(Source.single(new Incoming("BYE!!!!")))
+                        .map((msg) -> (ServerMessage) new Incoming(msg.asTextMessage().getStrictText()))
+                        .concat(Source.single(new OnDisconnected()))
                         .to(Sink.actorRef(flowManager, PoisonPill.getInstance()));
 
         Flow<Message, Message, NotUsed> flow = Flow.fromSinkAndSource(sink, source);
@@ -74,5 +75,62 @@ public class WebSocketServer extends AllDirectives {
 
         return flow;
 
+    }
+
+    /**
+     * Base server message.
+     */
+    abstract static class ServerMessage {
+    }
+
+    /**
+     * Incoming message with payload.
+     */
+    static class Incoming extends ServerMessage {
+        private String payload;
+
+        Incoming(String payload) {
+            this.payload = payload;
+        }
+
+        String getPayload() {
+            return payload;
+        }
+    }
+
+    /**
+     * Outgoing message with payload.
+     */
+    static class Outgoing extends ServerMessage {
+        private String payload;
+
+        public Outgoing(String payload) {
+            this.payload = payload;
+        }
+
+        String getPayload() {
+            return payload;
+        }
+    }
+
+    /**
+     * Service signal.
+     */
+    static class OnConnected extends ServerMessage {
+        private ActorRef handler;
+
+        OnConnected(ActorRef handler) {
+            this.handler = handler;
+        }
+
+        ActorRef getHandlerRef() {
+            return handler;
+        }
+    }
+
+    /**
+     * Service signal.
+     */
+    static class OnDisconnected extends ServerMessage {
     }
 }
