@@ -1,0 +1,84 @@
+# TODO check, see details at  https://blog.sourcerer.io/a-kubernetes-quick-start-for-people-who-know-just-enough-about-docker-to-get-by-71c5933b4633
+# Define persistent volume resource with specified capacity
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: mongo-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 3Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt/data/mongo"
+---
+# Claim part of the PersistentVolume for volume needs
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mongo-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# MongoDB deployment spec
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+      role: master
+      tier: backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: mongo
+        image: mongo
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: data
+          mountPath: /data/db
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: mongo-pv-clai
+---
+# MongoDB service spec
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+  labels:
+    app: mongo
+    role: master
+    tier: backend
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  # Replace with the IP of your minikube node / master node if you want external access
+  # externalIPs:
+  #   - xxx.zzz.yyy.qqq
+  selector:
+    app: mongo
+    role: master
+    tier: backend
