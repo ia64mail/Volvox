@@ -72,6 +72,10 @@ Hints:
    ```cmd
    kubectl exec -it XXX -- /bin/bash
    ```       
+ - Login onto minikube bash
+   ```cmd
+   minikube ssh
+   ```       
  
 See more details at [Kubernetes Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/). 
  
